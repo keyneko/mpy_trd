@@ -20,7 +20,7 @@ $ esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x100
 ```bash
 $ sudo apt-get install build-essential libreadline-dev libffi-dev git pkg-config libsdl2-2.0-0 libsdl2-dev python3.8 parallel
 
-$ git clone https://github.com/lvgl/lv_micropython.git
+$ git clone --recursive https://github.com/lvgl/lv_micropython.git
 $ cd lv_micropython
 	$ git checkout release/v8
 $ git submodule update --init --recursive lib/lv_bindings
@@ -31,15 +31,15 @@ fix: lv_micropython/lib/lv_bindings/lvgl/src/drivers/sdl/lv_sdl_window.c
 
 
 # ESP32 port
-# ESP-IDF工具链安装（MicroPython最大支持到esp-idf v4.4）
-$ git clone -b v4.4 --recursive https://github.com/espressif/esp-idf.git
-$ cd esp-idf
-$ git checkout v4.4
-$ git submodule update --init --recursive
-$ ./install.sh 
-  # 如果./install.sh报错
-  $ sudo rm ~/.espressif/idf-env.json 
-  $ ./install.sh 
+# MicroPython最大支持到esp-idf v4.4
+	$ git clone -b v4.4 --recursive https://github.com/espressif/esp-idf.git
+	$ cd esp-idf
+	$ git checkout v4.4
+	$ git submodule update --init --recursive
+	$ ./install.sh 
+		# 如果./install.sh报错
+		$ sudo rm ~/.espressif/idf-env.json 
+		$ ./install.sh 
 $ source '/home/keyneko/Documents/GitHub/esp-idf/export.sh'
 
 # 如果是v4.4.7版本, 修改lv_micropython/ports/esp32/network_common.c
@@ -71,15 +71,12 @@ $ picocom -b 115200 /dev/ttyUSB0
 # ESP8266 prot
 # 安装esp8266工具链
 $ sudo apt-get install libtool-bin
-  # 安装可能缺少的依赖包
 	$ sudo apt-get install help2man
-
 $ git clone https://github.com/pfalcon/esp-open-sdk.git
 $ cd esp-open-sdk
-# To build the self-contained, standalone toolchain+SDK
 $ make STANDALONE=y
 	$ sudo apt-get install python-dev
-	# 网络问题，需要手动下载tarballs包
+	# 手动下载tarballs包
 	$ cd crosstool-NG/.build/tarballs
 	$ wget https://libisl.sourceforge.io/isl-0.14.tar.xz
 	$ wget http://mirror.opencompute.org/onie/crosstool-NG/expat-2.1.0.tar.gz
@@ -88,7 +85,9 @@ $ make STANDALONE=y
 $ export PATH=$PATH:/home/keyneko/Documents/GitHub/esp-open-sdk/xtensa-lx106-elf/bin
 $ cd ports/esp8266
 $ make submodules
-$ make 
-$ esptool.py --port /dev/ttyXXX erase_flash
+$ make -j BOARD=ESP8266_GENERIC
+$ esptool.py --port /dev/ttyUSB0 erase_flash
 $ make deploy
+	$ make PORT=/dev/ttyUSB0 deploy
+
 ```
